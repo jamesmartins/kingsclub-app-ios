@@ -6,13 +6,33 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		47EFBC992D92225E004E5362 /* OneSignalExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 47EFBC982D92225E004E5362 /* OneSignalExtension */; };
+		47EFBC9B2D92225E004E5362 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 47EFBC9A2D92225E004E5362 /* OneSignalFramework */; };
+		47EFBC9D2D92225E004E5362 /* OneSignalInAppMessages in Frameworks */ = {isa = PBXBuildFile; productRef = 47EFBC9C2D92225E004E5362 /* OneSignalInAppMessages */; };
+		47EFBC9F2D92225E004E5362 /* OneSignalLocation in Frameworks */ = {isa = PBXBuildFile; productRef = 47EFBC9E2D92225E004E5362 /* OneSignalLocation */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		471C68602D8C61BA009B688A /* KingsClub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KingsClub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		475402232D923B130060D0E3 /* Exceptions for "KingsClub" folder in "KingsClub" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 471C685F2D8C61BA009B688A /* KingsClub */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		471C68622D8C61BA009B688A /* KingsClub */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				475402232D923B130060D0E3 /* Exceptions for "KingsClub" folder in "KingsClub" target */,
+			);
 			path = KingsClub;
 			sourceTree = "<group>";
 		};
@@ -23,6 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47EFBC9D2D92225E004E5362 /* OneSignalInAppMessages in Frameworks */,
+				47EFBC9B2D92225E004E5362 /* OneSignalFramework in Frameworks */,
+				47EFBC9F2D92225E004E5362 /* OneSignalLocation in Frameworks */,
+				47EFBC992D92225E004E5362 /* OneSignalExtension in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +89,10 @@
 			);
 			name = KingsClub;
 			packageProductDependencies = (
+				47EFBC982D92225E004E5362 /* OneSignalExtension */,
+				47EFBC9A2D92225E004E5362 /* OneSignalFramework */,
+				47EFBC9C2D92225E004E5362 /* OneSignalInAppMessages */,
+				47EFBC9E2D92225E004E5362 /* OneSignalLocation */,
 			);
 			productName = KingsClub;
 			productReference = 471C68602D8C61BA009B688A /* KingsClub.app */;
@@ -94,6 +122,9 @@
 			);
 			mainGroup = 471C68572D8C61BA009B688A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 471C68612D8C61BA009B688A /* Products */;
 			projectDirPath = "";
@@ -252,11 +283,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"KingsClub/Preview Content\"";
+				DEVELOPMENT_TEAM = WBAYHN46PY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KingsClub/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kings Club";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -280,11 +313,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"KingsClub/Preview Content\"";
+				DEVELOPMENT_TEAM = WBAYHN46PY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KingsClub/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kings Club";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -322,6 +357,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OneSignal/OneSignal-XCFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.10;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		47EFBC982D92225E004E5362 /* OneSignalExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalExtension;
+		};
+		47EFBC9A2D92225E004E5362 /* OneSignalFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalFramework;
+		};
+		47EFBC9C2D92225E004E5362 /* OneSignalInAppMessages */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalInAppMessages;
+		};
+		47EFBC9E2D92225E004E5362 /* OneSignalLocation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 47EFBC972D92225E004E5362 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalLocation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 471C68582D8C61BA009B688A /* Project object */;
 }
