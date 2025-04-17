@@ -29,7 +29,7 @@ class APIManager {
         }
         
         if authorizationCode {
-            request.addValue("VVNOMFZHeldxMkVJR1JCWmZkNVpxMU1icHFGRzhROHlXUWZrTnowVEQ4Y0VqekFGWURIUEt3wqLCog==", forHTTPHeaderField: "authorizationCode")
+            request.addValue("UmhWckNSTGlSdUZzwqNPYW9aQXBtNlVwVkJQb1AyWkIzTEo3c8Kjd0Q4NWk3Q3PCo1NSNjZ1cmRYU0JRwqLCog==", forHTTPHeaderField: "authorizationCode")
         }
         
         switch method {

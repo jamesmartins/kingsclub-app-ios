@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WebView: View {
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     @AppStorage("authAppidU") var authAppidU    = ""
     
     @State var url : URL
@@ -18,6 +19,8 @@ struct WebView: View {
     
     var body: some View {
         ZStack{
+            Color.white
+                .ignoresSafeArea()
             if isLoading {
                 LoadingView(text:"Carregando...")
                     .zIndex(1.5)
@@ -41,7 +44,9 @@ struct WebView: View {
                 presentationMode.wrappedValue.dismiss()
             }
             .zIndex(1.0)
-        }.ignoresSafeArea(.all, edges: .bottom)
+            .ignoresSafeArea(.all, edges: .bottom)
+        }
+        .environment(\.colorScheme, .light)
     }
 }
 

@@ -8,6 +8,7 @@
 import Foundation
 
 enum Links: String {
+    
     case cadastro = "consulta_V2.do?key=0keurq3V0gU¢"
     case faleConosco = "faleConosco.do?key=0keurq3V0gU¢"
     case parceiro = "parceiro.do?key=0keurq3V0gU¢"
@@ -25,6 +26,7 @@ enum Links: String {
             
             var key = ""
             var idU = ""
+            var idL = ""
             
             if DataInteractor.shared.authAppkey == "" || DataInteractor.shared.authAppidU == "" {
                 guard let authApp = DataInteractor.shared.authApp else {
@@ -33,13 +35,17 @@ enum Links: String {
                 }
                 key = authApp.key
                 idU = authApp.idU
+                idL = authApp.idL
+                
             } else {
                 key = DataInteractor.shared.authAppkey
                 idU = DataInteractor.shared.authAppidU
+                idL = DataInteractor.shared.authAppidL
             }
             
-            let urlString = "https://adm.bunkerapp.com.br/app/intro.do?key=" + key + "&idU=" + idU + "&cds=0"
-            //let urlString = "https://adm.bunkerapp.com.br/app/novoMenu.do?key=" + key + "&idU=" + idU + "&cds=0"
+            
+            //let urlString = "https://adm.bunkerapp.com.br/app/novoMenu.do?key=" + key + "&idU=pEUBe2rXBNlU4UV0bpqo6w¢¢" + "&idL=" + idL + "&cds=0"
+            let urlString = "https://adm.bunkerapp.com.br/app/novoMenu.do?key=" + key + "&idU=" + idU + "&idL=" + idL + "&cds=0"
             
             if let url = URL(string: urlString) {
                 print("Link obtido:\(url.absoluteString)")

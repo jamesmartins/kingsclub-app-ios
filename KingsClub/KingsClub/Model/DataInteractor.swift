@@ -13,6 +13,7 @@ class DataInteractor {
     //MARK: - Vars
     @AppStorage("authAppkey") var authAppkey    = ""
     @AppStorage("authAppidU") var authAppidU    = ""
+    @AppStorage("authAppidL") var authAppidL    = ""
     
     private init() {}
     static var shared = DataInteractor()
@@ -64,9 +65,13 @@ class DataInteractor {
             do {
                 let param : [String:Any] = [ "CPF":user , "SENHA":password]
                 let data : AuthApp = try await apiManager.performRequest(urlString: Links.login.rawValue, method: .post(body: param))
+                
+                print(data)
+                
                 self.authApp = data
                 self.authAppkey = self.authApp?.key ?? ""
                 self.authAppidU = self.authApp?.idU ?? ""
+                self.authAppidL = self.authApp?.idL ?? ""
                 
                 consultaCli(idU: self.authAppidU) { result in
                     switch result{

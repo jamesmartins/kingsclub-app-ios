@@ -18,6 +18,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack{
+            Color.white
             if isLoading {
                 LoadingView(text:"Carregando...")
                     .zIndex(1.5)
@@ -36,8 +37,6 @@ struct ContentView: View {
                     .resizable()
                     .scaledToFit()
                     .padding()
-                    .frame(width: .infinity)
-                
                 
                 // Entrar Button
                 Button(action: {
@@ -95,7 +94,7 @@ struct ContentView: View {
             .zIndex(1.0)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding(.vertical)
+        .ignoresSafeArea()
         .fullScreenCover(isPresented: $callLogin) {
             LoginView()
         }

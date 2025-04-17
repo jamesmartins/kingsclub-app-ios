@@ -4,6 +4,7 @@ import LocalAuthentication
 struct LoginView: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     let primaryColor = Color(red: 28/255, green: 44/255, blue: 138/255)
     let screenWidth = UIScreen.main.bounds.width
     @State private var cpfCnpj: String = ""
@@ -51,7 +52,7 @@ struct LoginView: View {
                         
                         Text("Faça seu Login")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor( .white)
                         
                         Spacer()
                         
@@ -196,11 +197,11 @@ struct LoginView: View {
                         }
                         
                         .padding()
-                        .frame(width: .infinity,height: .infinity)
+                        //.frame(width: .infinity,height: .infinity)
                     }
                 }
             }
-                .frame(width: .infinity, height: .infinity)
+                //.frame(width: .infinity, height: .infinity)
                 .zIndex(1)
                 .fullScreenCover(isPresented: $showWebView){
                     WebView(url: DataInteractor.getURL(destinationWebView)) { errorDescription in
@@ -210,6 +211,11 @@ struct LoginView: View {
                 .onAppear{
                     self.cpfCnpj = username
                     self.senha   = password
+                    if self.cpfCnpj.isEmpty && self.senha.isEmpty{
+                        self.rememberLogin = false
+                    } else {
+                        self.rememberLogin = true
+                    }
                     DispatchQueue.main.async{
                         authFaceID(true)
                     }
@@ -229,13 +235,14 @@ struct LoginView: View {
                         erroFaceID = false
                     }
                 }
-                .alert("Erro no Login!\n\(errorMessage)", isPresented: $errorLogin ) {
+                .alert("Erro no Login!\n\n\(errorMessage)", isPresented: $errorLogin ) {
                     Button("OK", role: .cancel) {
                         errorLogin = false
                         errorMessage = ""
                     }
                 }
         }
+        .environment(\.colorScheme, .light)
     }
 }
 
