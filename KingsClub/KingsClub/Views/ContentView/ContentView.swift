@@ -78,7 +78,7 @@ struct ContentView: View {
                 }
                 .padding(.top, 20)
                 
-                Button(action: {
+                /*Button(action: {
                     showWebView = true
                     destinationWebView = .parceiro
                 }) {
@@ -86,7 +86,7 @@ struct ContentView: View {
                         .foregroundColor(primaryColor)
                         .font(.system(size: 16, weight: .bold))
                 }
-                .padding(.top, 20)
+                .padding(.top, 20)*/
                 
                 Spacer()
                 
