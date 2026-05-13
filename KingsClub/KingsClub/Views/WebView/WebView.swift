@@ -5,6 +5,7 @@
 //  Created by Duane de Moura Silva on 18/12/23.
 //
 
+import SafariServices
 import SwiftUI
 
 struct WebView: View {
@@ -16,6 +17,8 @@ struct WebView: View {
     var didFail: (String) -> Void
     
     @State var isLoading = true
+    @State private var safariURL: URL?
+    @State private var showSafari = false
     
     var body: some View {
         ZStack{
@@ -42,11 +45,32 @@ struct WebView: View {
                 presentationMode.wrappedValue.dismiss()
             } callMainView: {
                 presentationMode.wrappedValue.dismiss()
+            } openSafari: { url in
+                isLoading = false
+                safariURL = url
+                showSafari = true
             }
             .zIndex(1.0)
             .ignoresSafeArea(.all, edges: .bottom)
         }
+        .sheet(isPresented: $showSafari) {
+            if let safariURL {
+                SafariView(url: safariURL)
+                    .ignoresSafeArea()
+            }
+        }
         .environment(\.colorScheme, .light)
+    }
+}
+
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        SFSafariViewController(url: url)
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
     }
 }
 

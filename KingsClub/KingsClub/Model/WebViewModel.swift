@@ -9,6 +9,7 @@ struct WebViewModel: UIViewRepresentable {
     var didFinish: () -> Void
     var didFail: (String) -> Void
     var callMainView: () -> Void
+    var openSafari: (URL) -> Void
     
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero)
@@ -25,7 +26,7 @@ struct WebViewModel: UIViewRepresentable {
     }
     
     func makeCoordinator() -> WebViewCoordinator {
-        WebViewCoordinator(didStart: didStart, didFinish: didFinish, didFail: didFail, callMainView: callMainView)
+        WebViewCoordinator(didStart: didStart, didFinish: didFinish, didFail: didFail, callMainView: callMainView, openSafari: openSafari)
     }
 }
 
@@ -35,14 +36,30 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
     var didFinish: () -> Void
     var didFail: (String) -> Void
     var callMainView: () -> Void
+    var openSafari: (URL) -> Void
     
-    init(didStart: @escaping () -> Void, didFinish: @escaping () -> Void, didFail: @escaping (String) -> Void, callMainView: @escaping () -> Void) {
+    init(didStart: @escaping () -> Void, didFinish: @escaping () -> Void, didFail: @escaping (String) -> Void, callMainView: @escaping () -> Void, openSafari: @escaping (URL) -> Void) {
         self.didStart = didStart
         self.didFinish = didFinish
         self.didFail = didFail
         self.callMainView = callMainView
+        self.openSafari = openSafari
     }
     
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
+        
+        if url.absoluteString.range(of: "https://www.lojakings.com.br", options: [.anchored, .caseInsensitive]) != nil {
+            openSafari(url)
+            decisionHandler(.cancel)
+            return
+        }
+        
+        decisionHandler(.allow)
+    }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         didStart()
