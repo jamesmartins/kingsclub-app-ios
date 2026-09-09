@@ -13,7 +13,10 @@ struct LoginView: View {
     @State private var isPasswordVisible = false
     @State var isLoading = false
     @State var showWebView = false
+    @State var showHome = false
+    @StateObject private var homeViewModel = HomeViewModel()
     @State var destinationWebView = WebViewDestination.esqueciMinhaSenha
+    @AppStorage("authAppidL") var authAppidL = ""
     let maxCPFLength = 14
     let maxCNPJLength = 18
     @FocusState private var isTextFieldFocused: Bool
@@ -208,6 +211,17 @@ struct LoginView: View {
                         print(errorDescription)
                     }
                 }
+                .fullScreenCover(isPresented: $showHome) {
+                    HomeView(viewModel: homeViewModel)
+                        .onAppear {
+                            homeViewModel.onBack = {
+                                showHome = false
+                            }
+                            homeViewModel.onLogout = {
+                                clearSessionAndCloseHome()
+                            }
+                        }
+                }
                 .onAppear{
                     self.cpfCnpj = username
                     self.senha   = password
@@ -341,8 +355,7 @@ extension LoginView {
         if !self.novoLogin {
             print("Login sem request realizado com sucesso!")
             isLoading = false
-            destinationWebView = .novoMenu
-            showWebView = true
+            presentPostLoginHome()
             return
         }
         DataInteractor.shared.login(user: self.extractNumbers(from: self.cpfCnpj), password: self.senha) { result in
@@ -351,8 +364,7 @@ extension LoginView {
                 DispatchQueue.main.async{
                     print("Login realizado com sucesso!")
                     isLoading = false
-                    destinationWebView = .novoMenu
-                    showWebView = true
+                    presentPostLoginHome()
                 }
             case .failure(let error):
                 DispatchQueue.main.async{
@@ -368,6 +380,23 @@ extension LoginView {
                 }
             }
         }
+    }
+
+    private func presentPostLoginHome() {
+        if HomeViewModel.legacyWebMenuEnabled {
+            destinationWebView = .novoMenu
+            showWebView = true
+        } else {
+            showHome = true
+        }
+    }
+
+    private func clearSessionAndCloseHome() {
+        authAppkey = ""
+        authAppidU = ""
+        authAppidL = ""
+        DataInteractor.shared.authApp = nil
+        showHome = false
     }
     
     //MARK: - Fechando o teclado
