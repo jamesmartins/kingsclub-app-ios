@@ -63,6 +63,10 @@ final class HomeViewModel: ObservableObject {
     /// Chave curta do app (`intro.do?key=`), não o Base64 do login/APP.do.
     static let bunkerAppKey = "0keurq3V0gU¢"
 
+    /// `tipoToken.do` não vem no APP.do. Só o `t` é fixo; `key` e `idU` vêm da sessão do usuário logado.
+    static let tokenURLTemplate =
+        "https://adm.bunkerapp.com.br/app/tipoToken.do?t=OVH52RxQp£APz78WQcIhp£Frjhs£rKrp5wZ"
+
     @Published var firstName: String
     @Published var availableBalance: Decimal
     @Published var redeemedBalance: Decimal
@@ -106,6 +110,30 @@ final class HomeViewModel: ObservableObject {
 
     var canGenerateToken: Bool {
         availableBalance > 0
+    }
+
+    func openToken() {
+        guard canGenerateToken else { return }
+        if let url = tokenURL() {
+            onOpenURL?(url, "Gerar Token")
+            return
+        }
+        errorMessage = "Link de token indisponível."
+    }
+
+    func tokenURL() -> URL? {
+        let built = Self.buildMenuURL(
+            from: Self.tokenURLTemplate,
+            appKey: appKey,
+            idU: idU
+        )
+        print("Menu URL [Gerar Token] (tipoToken):", built)
+        if let url = URL(string: built) {
+            return url
+        }
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.insert(charactersIn: ":/?#[]@!$&'()*+,;=")
+        return built.addingPercentEncoding(withAllowedCharacters: allowed).flatMap(URL.init(string:))
     }
 
     func configure(cpf: String?, idU: String?, appKey: String = HomeViewModel.bunkerAppKey) {
