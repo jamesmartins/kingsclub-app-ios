@@ -53,7 +53,7 @@ struct HomeView: View {
             viewModel.loadHome()
         }
         .fullScreenCover(item: $menuWebLink) { link in
-            WebView(url: link.url) { errorDescription in
+            WebView(url: link.url, dismissOnFail: false) { errorDescription in
                 print(errorDescription)
             }
         }
@@ -62,21 +62,14 @@ struct HomeView: View {
     // MARK: - Header
 
     private var navigationBar: some View {
-        HStack {
-            Button(action: { viewModel.backTapped() }) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 44, height: 44)
-            }
-
-            Spacer()
-
-            Text("Navegação")
-                .font(.system(size: 17, weight: .semibold))
+        HStack(alignment: .center, spacing: 12) {
+            Text(viewModel.greeting)
+                .font(.system(size: 28, weight: .bold))
                 .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             Image("logo_icon")
                 .resizable()
@@ -84,18 +77,13 @@ struct HomeView: View {
                 .frame(width: 44, height: 44)
                 .clipShape(Circle())
         }
-        .padding(.horizontal, 8)
-        .padding(.top, 4)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
     }
 
     private var balanceSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(viewModel.greeting)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-
             Text("Saldo disponível")
                 .font(.system(size: 14, weight: .regular))
                 .foregroundColor(HomeColors.secondaryLabel)

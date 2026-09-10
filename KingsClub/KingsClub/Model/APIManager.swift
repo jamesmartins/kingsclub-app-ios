@@ -59,9 +59,8 @@ class APIManager {
         }
         
         let configuration = URLSessionConfiguration.default
-        /*
-        configuration.timeoutIntervalForRequest = 300
-        configuration.timeoutIntervalForResource = 5*/
+        configuration.timeoutIntervalForRequest = 60
+        configuration.timeoutIntervalForResource = 120
         let customCache = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
         configuration.urlCache = customCache
         let session = URLSession(configuration: configuration)
