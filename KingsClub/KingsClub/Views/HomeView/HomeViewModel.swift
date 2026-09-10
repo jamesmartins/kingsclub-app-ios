@@ -104,6 +104,10 @@ final class HomeViewModel: ObservableObject {
         "Olá, \(firstName)!"
     }
 
+    var canGenerateToken: Bool {
+        availableBalance > 0
+    }
+
     func configure(cpf: String?, idU: String?, appKey: String = HomeViewModel.bunkerAppKey) {
         self.cpf = cpf
         self.idU = idU

@@ -140,15 +140,23 @@ struct HomeView: View {
     }
 
     private var tokenBanner: some View {
-        Text(viewModel.tokenBannerText)
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundColor(HomeColors.tileForeground)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 12)
-            .background(HomeColors.tileBackground)
-            .cornerRadius(10)
+        HStack(spacing: 10) {
+            if viewModel.canGenerateToken {
+                Image(systemName: "qrcode")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(HomeColors.tileForeground)
+            }
+
+            Text(viewModel.tokenBannerText)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundColor(HomeColors.tileForeground)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 12)
+        .background(viewModel.canGenerateToken ? Color.white : HomeColors.tileBackground)
+        .cornerRadius(10)
     }
 
     // MARK: - Menu
