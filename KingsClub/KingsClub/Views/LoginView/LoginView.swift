@@ -217,8 +217,13 @@ struct LoginView: View {
                             homeViewModel.onBack = {
                                 showHome = false
                             }
-                            homeViewModel.onLogout = {
+                            homeViewModel.onLogout = { logoutURL in
                                 clearSessionAndCloseHome()
+                                if let logoutURL {
+                                    // Carrega logout/intro em WebView oculta no fluxo futuro;
+                                    // por agora só registra a URL montada.
+                                    print("Logout URL:", logoutURL.absoluteString)
+                                }
                             }
                         }
                 }
@@ -318,6 +323,7 @@ extension LoginView {
                 self.password = self.senha
                 self.novoLogin = true
             }
+            persistCPFDigits(from: cpfCnpj)
         } else {
             self.novoLogin = true
             self.username = ""
@@ -352,6 +358,8 @@ extension LoginView {
     func login(){
         dump("login!")
         isLoading = true
+        // Garante CPF só com dígitos antes de qualquer caminho (novo ou cache).
+        persistCPFDigits(from: cpfCnpj)
         if !self.novoLogin {
             print("Login sem request realizado com sucesso!")
             isLoading = false
@@ -387,8 +395,30 @@ extension LoginView {
             destinationWebView = .novoMenu
             showWebView = true
         } else {
+            let cpfDigits = resolvedCPFDigits()
+            let idU = authAppidU.isEmpty
+                ? (DataInteractor.shared.authApp?.idU ?? "")
+                : authAppidU
+            print("Home configure CPF digits count: \(cpfDigits.count), idU empty: \(idU.isEmpty)")
+            homeViewModel.configure(cpf: cpfDigits.isEmpty ? nil : cpfDigits, idU: idU)
             showHome = true
         }
+    }
+
+    /// CPF/CNPJ só com dígitos, na ordem: campo atual → UserDefaults → username salvo.
+    private func resolvedCPFDigits() -> String {
+        let candidates = [
+            extractNumbers(from: cpfCnpj),
+            extractNumbers(from: UserDefaults.standard.string(forKey: "cpf") ?? ""),
+            extractNumbers(from: username)
+        ]
+        return candidates.first(where: { !$0.isEmpty }) ?? ""
+    }
+
+    private func persistCPFDigits(from raw: String) {
+        let digits = extractNumbers(from: raw)
+        guard !digits.isEmpty else { return }
+        UserDefaults.standard.set(digits, forKey: "cpf")
     }
 
     private func clearSessionAndCloseHome() {
@@ -396,6 +426,12 @@ extension LoginView {
         authAppidU = ""
         authAppidL = ""
         DataInteractor.shared.authApp = nil
+        homeViewModel.availableBalance = 0
+        homeViewModel.redeemedBalance = 0
+        homeViewModel.expiredBalance = 0
+        homeViewModel.firstName = "App"
+        homeViewModel.errorMessage = nil
+        homeViewModel.cpf = nil
         showHome = false
     }
     

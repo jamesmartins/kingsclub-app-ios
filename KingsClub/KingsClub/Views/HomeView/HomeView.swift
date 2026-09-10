@@ -12,6 +12,7 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     private let menuItems = HomeMenuItem.allCases
+    @State private var menuWebLink: IdentifiableURL?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -45,6 +46,17 @@ struct HomeView: View {
             }
         }
         .environment(\.colorScheme, .light)
+        .onAppear {
+            viewModel.onOpenURL = { url, _ in
+                menuWebLink = IdentifiableURL(url: url)
+            }
+            viewModel.loadHome()
+        }
+        .fullScreenCover(item: $menuWebLink) { link in
+            WebView(url: link.url) { errorDescription in
+                print(errorDescription)
+            }
+        }
     }
 
     // MARK: - Header
@@ -91,6 +103,13 @@ struct HomeView: View {
             Text(viewModel.formattedCurrency(viewModel.availableBalance))
                 .font(.system(size: 36, weight: .bold))
                 .foregroundColor(.white)
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.9))
+                    .padding(.top, 4)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -216,4 +235,9 @@ private struct RoundedCorner: Shape {
 
 #Preview {
     HomeView(viewModel: HomeViewModel())
+}
+
+struct IdentifiableURL: Identifiable {
+    let id = UUID()
+    let url: URL
 }

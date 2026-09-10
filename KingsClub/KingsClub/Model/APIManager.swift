@@ -16,7 +16,12 @@ enum HTTPMethod {
 
 class APIManager {
     
-    func performRequest<T: Decodable>(urlString: String, method: HTTPMethod, token: String = "", authorizationCode: Bool = true) async throws -> T {
+    func performRequest<T: Decodable>(
+        urlString: String,
+        method: HTTPMethod,
+        token: String = "",
+        authorizationCode: String? = AppSecrets.authorizationCode
+    ) async throws -> T {
         guard let url = URL(string: urlString) else {
             print("0 - erro no request \(#function):\n\(URLError(.badURL).localizedDescription)\n")
             throw URLError(.badURL)
@@ -28,8 +33,8 @@ class APIManager {
             request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        if authorizationCode {
-            request.addValue("UmhWckNSTGlSdUZzwqNPYW9aQXBtNlVwVkJQb1AyWkIzTEo3c8Kjd0Q4NWk3Q3PCo1NSNjZ1cmRYU0JRwqLCog==", forHTTPHeaderField: "authorizationCode")
+        if let authorizationCode, !authorizationCode.isEmpty {
+            request.addValue(authorizationCode, forHTTPHeaderField: "authorizationCode")
         }
         
         switch method {
