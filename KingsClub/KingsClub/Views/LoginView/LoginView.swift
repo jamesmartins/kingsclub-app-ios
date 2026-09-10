@@ -14,6 +14,7 @@ struct LoginView: View {
     @State var isLoading = false
     @State var showWebView = false
     @State var showHome = false
+    @State var logoutWebURL: IdentifiableURL?
     @StateObject private var homeViewModel = HomeViewModel()
     @State var destinationWebView = WebViewDestination.esqueciMinhaSenha
     @AppStorage("authAppidL") var authAppidL = ""
@@ -218,14 +219,24 @@ struct LoginView: View {
                                 showHome = false
                             }
                             homeViewModel.onLogout = { logoutURL in
-                                clearSessionAndCloseHome()
-                                if let logoutURL {
-                                    // Carrega logout/intro em WebView oculta no fluxo futuro;
-                                    // por agora só registra a URL montada.
-                                    print("Logout URL:", logoutURL.absoluteString)
-                                }
+                                performLogout(redirectURL: logoutURL)
                             }
                         }
+                }
+                .fullScreenCover(item: $logoutWebURL) { link in
+                    WebView(
+                        url: link.url,
+                        dismissOnFail: true,
+                        closesOnIntroStart: false,
+                        dismissOnFinish: true,
+                        onFinished: {
+                            logoutWebURL = nil
+                        },
+                        didFail: { error in
+                            print("Logout WebView fail:", error)
+                            logoutWebURL = nil
+                        }
+                    )
                 }
                 .onAppear{
                     self.cpfCnpj = username
@@ -421,17 +432,55 @@ extension LoginView {
         UserDefaults.standard.set(digits, forKey: "cpf")
     }
 
-    private func clearSessionAndCloseHome() {
+    private func performLogout(redirectURL: URL?) {
+        let destination = redirectURL ?? Links.intro.url
+        print("Logout URL:", destination.absoluteString)
+
+        clearSessionCredentials()
+        resetHomeViewModel()
+        resetLoginForm()
+        showHome = false
+
+        // Dispensa a Home e em seguida carrega o logout no servidor (intro.do).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            self.logoutWebURL = IdentifiableURL(url: destination)
+        }
+    }
+
+    private func clearSessionCredentials() {
         authAppkey = ""
         authAppidU = ""
         authAppidL = ""
+        username = ""
+        password = ""
+        UserDefaults.standard.removeObject(forKey: "cpf")
+        UserDefaults.standard.removeObject(forKey: "userName")
         DataInteractor.shared.authApp = nil
+        DataInteractor.shared.clearWebsiteData()
+    }
+
+    private func resetHomeViewModel() {
         homeViewModel.availableBalance = 0
         homeViewModel.redeemedBalance = 0
         homeViewModel.expiredBalance = 0
         homeViewModel.firstName = "App"
         homeViewModel.errorMessage = nil
         homeViewModel.cpf = nil
+        homeViewModel.idU = nil
+        homeViewModel.tokenBannerText = "Ainda não há saldo para gerar tokens"
+    }
+
+    private func resetLoginForm() {
+        cpfCnpj = ""
+        senha = ""
+        rememberLogin = false
+        novoLogin = true
+    }
+
+    private func clearSessionAndCloseHome() {
+        clearSessionCredentials()
+        resetHomeViewModel()
+        resetLoginForm()
         showHome = false
     }
     

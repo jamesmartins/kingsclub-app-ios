@@ -7,6 +7,7 @@
 
 import SwiftUI
 import OneSignalFramework
+import WebKit
 
 class DataInteractor {
     
@@ -147,5 +148,16 @@ class DataInteractor {
         }
         return nil
     }
-    
+
+    /// Limpa cookies/cache do WKWebView (logout completo).
+    func clearWebsiteData() {
+        let dataStore = WKWebsiteDataStore.default()
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+        dataStore.fetchDataRecords(ofTypes: types) { records in
+            dataStore.removeData(ofTypes: types, for: records) {
+                print("Website data cleared after logout")
+            }
+        }
+        HTTPCookieStorage.shared.cookies?.forEach { HTTPCookieStorage.shared.deleteCookie($0) }
+    }
 }

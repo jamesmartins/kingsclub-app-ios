@@ -299,7 +299,8 @@ final class HomeViewModel: ObservableObject {
             if case .success(let response) = result {
                 self.menuLinks = response.novoMenu?.links ?? [:]
             }
-            onLogout?(self.url(for: .logout))
+            // Fallback: intro do app se o link logout não estiver disponível.
+            self.onLogout?(self.url(for: .logout) ?? Links.intro.url)
         }
     }
 

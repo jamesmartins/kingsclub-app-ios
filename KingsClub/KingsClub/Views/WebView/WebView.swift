@@ -15,6 +15,11 @@ struct WebView: View {
     var didFail: (String) -> Void
     /// Se `false`, mantém a tela aberta e oferece "Tentar novamente" (melhor para cards da Home).
     var dismissOnFail: Bool
+    /// Se `false`, deixa a navegação de `intro.do` concluir (fluxo de logout).
+    var closesOnIntroStart: Bool
+    /// Se `true`, fecha a WebView ao terminar o carregamento (logout).
+    var dismissOnFinish: Bool
+    var onFinished: (() -> Void)?
 
     @State var isLoading = true
     @State private var safariURL: URL?
@@ -23,9 +28,19 @@ struct WebView: View {
     @State private var errorMessage = ""
     @State private var reloadToken = 0
 
-    init(url: URL, dismissOnFail: Bool = true, didFail: @escaping (String) -> Void) {
+    init(
+        url: URL,
+        dismissOnFail: Bool = true,
+        closesOnIntroStart: Bool = true,
+        dismissOnFinish: Bool = false,
+        onFinished: (() -> Void)? = nil,
+        didFail: @escaping (String) -> Void
+    ) {
         self._url = State(initialValue: url)
         self.dismissOnFail = dismissOnFail
+        self.closesOnIntroStart = closesOnIntroStart
+        self.dismissOnFinish = dismissOnFinish
+        self.onFinished = onFinished
         self.didFail = didFail
     }
 
@@ -37,33 +52,45 @@ struct WebView: View {
                 LoadingView(text: "Carregando...")
                     .zIndex(1.5)
             }
-            WebViewModel(url: url) {
-                isLoading = true
-            } didFinish: {
-                isLoading = false
+            WebViewModel(
+                url: url,
+                closesOnIntroStart: closesOnIntroStart,
+                didStart: {
+                    isLoading = true
+                },
+                didFinish: {
+                    isLoading = false
 
-                if url.absoluteString.localizedCaseInsensitiveContains("novoMenu.do") {
-                    DataInteractor.shared.consultaCli(idU: DataInteractor.shared.authAppidU) { result in
-                        print(result)
+                    if url.absoluteString.localizedCaseInsensitiveContains("novoMenu.do") {
+                        DataInteractor.shared.consultaCli(idU: DataInteractor.shared.authAppidU) { result in
+                            print(result)
+                        }
                     }
-                }
 
-            } didFail: { error in
-                isLoading = false
-                errorMessage = error
-                if dismissOnFail {
-                    didFail(error)
+                    if dismissOnFinish {
+                        onFinished?()
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                },
+                didFail: { error in
+                    isLoading = false
+                    errorMessage = error
+                    if dismissOnFail {
+                        didFail(error)
+                        presentationMode.wrappedValue.dismiss()
+                    } else {
+                        showErrorAlert = true
+                    }
+                },
+                callMainView: {
                     presentationMode.wrappedValue.dismiss()
-                } else {
-                    showErrorAlert = true
+                },
+                openSafari: { url in
+                    isLoading = false
+                    safariURL = url
+                    showSafari = true
                 }
-            } callMainView: {
-                presentationMode.wrappedValue.dismiss()
-            } openSafari: { url in
-                isLoading = false
-                safariURL = url
-                showSafari = true
-            }
+            )
             .id(reloadToken)
             .zIndex(1.0)
             .ignoresSafeArea(.all, edges: .bottom)

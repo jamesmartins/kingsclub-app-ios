@@ -17,6 +17,9 @@ struct WebViewModel: UIViewRepresentable {
     typealias UIViewType = WKWebView
 
     let url: URL
+    /// Se `true`, ao detectar `intro.do` no início da navegação fecha a WebView.
+    /// No logout deve ser `false` para a URL de logout (intro) completar.
+    var closesOnIntroStart: Bool = true
     var didStart: () -> Void
     var didFinish: () -> Void
     var didFail: (String) -> Void
@@ -35,21 +38,23 @@ struct WebViewModel: UIViewRepresentable {
         }
         webView.navigationDelegate = context.coordinator
         context.coordinator.attach(webView: webView, url: url)
+        context.coordinator.closesOnIntroStart = closesOnIntroStart
         context.coordinator.load(url)
         return webView
     }
 
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        // Evita reload duplicado quando o SwiftUI reavalia a view.
         context.coordinator.didStart = didStart
         context.coordinator.didFinish = didFinish
         context.coordinator.didFail = didFail
         context.coordinator.callMainView = callMainView
         context.coordinator.openSafari = openSafari
+        context.coordinator.closesOnIntroStart = closesOnIntroStart
     }
 
     func makeCoordinator() -> WebViewCoordinator {
         WebViewCoordinator(
+            closesOnIntroStart: closesOnIntroStart,
             didStart: didStart,
             didFinish: didFinish,
             didFail: didFail,
@@ -60,6 +65,7 @@ struct WebViewModel: UIViewRepresentable {
 }
 
 final class WebViewCoordinator: NSObject, WKNavigationDelegate {
+    var closesOnIntroStart: Bool
     var didStart: () -> Void
     var didFinish: () -> Void
     var didFail: (String) -> Void
@@ -71,12 +77,14 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate {
     private var timeoutRetryCount = 0
 
     init(
+        closesOnIntroStart: Bool,
         didStart: @escaping () -> Void,
         didFinish: @escaping () -> Void,
         didFail: @escaping (String) -> Void,
         callMainView: @escaping () -> Void,
         openSafari: @escaping (URL) -> Void
     ) {
+        self.closesOnIntroStart = closesOnIntroStart
         self.didStart = didStart
         self.didFinish = didFinish
         self.didFail = didFail
@@ -94,7 +102,7 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate {
         currentURL = url
         var request = URLRequest(
             url: url,
-            cachePolicy: .reloadRevalidatingCacheData,
+            cachePolicy: .reloadIgnoringLocalCacheData,
             timeoutInterval: WebViewTuning.requestTimeout
         )
         request.allowsCellularAccess = true
@@ -127,10 +135,8 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         didStart()
         print("didStart url:\(webView.url?.absoluteString ?? currentURL?.absoluteString ?? "-")")
-        if let url = webView.url, url.absoluteString.localizedCaseInsensitiveContains("intro.do") {
-            webView.stopLoading()
-            callMainView()
-        } else if let url = webView.url, url.absoluteString.localizedCaseInsensitiveContains("intro.php") {
+        guard closesOnIntroStart else { return }
+        if let url = webView.url, isIntroURL(url) {
             webView.stopLoading()
             callMainView()
         }
@@ -150,10 +156,14 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate {
         handleLoadFailure(error)
     }
 
+    private func isIntroURL(_ url: URL) -> Bool {
+        let value = url.absoluteString.lowercased()
+        return value.contains("intro.do") || value.contains("intro.php")
+    }
+
     private func handleLoadFailure(_ error: Error) {
         let nsError = error as NSError
 
-        // Cancelamento por navegação nova / stopLoading — ignorar.
         if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled {
             return
         }
