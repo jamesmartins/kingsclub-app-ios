@@ -81,7 +81,10 @@ final class HomeViewModel: ObservableObject {
     private(set) var menuLinks: [String: String] = [:]
 
     var onBack: (() -> Void)?
+    /// Chamado ao tocar em Sair com a URL do serviço (apresentar WebView de logout).
     var onLogout: ((URL?) -> Void)?
+    /// Chamado quando logout local + serviço terminaram (aí sim volta ao login).
+    var onLogoutCompleted: (() -> Void)?
     var onOpenURL: ((URL, String) -> Void)?
 
     init(

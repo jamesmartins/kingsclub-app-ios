@@ -14,7 +14,6 @@ struct LoginView: View {
     @State var isLoading = false
     @State var showWebView = false
     @State var showHome = false
-    @State var logoutWebURL: IdentifiableURL?
     @StateObject private var homeViewModel = HomeViewModel()
     @State var destinationWebView = WebViewDestination.esqueciMinhaSenha
     @AppStorage("authAppidL") var authAppidL = ""
@@ -218,25 +217,10 @@ struct LoginView: View {
                             homeViewModel.onBack = {
                                 showHome = false
                             }
-                            homeViewModel.onLogout = { logoutURL in
-                                performLogout(redirectURL: logoutURL)
+                            homeViewModel.onLogoutCompleted = {
+                                finishLogout()
                             }
                         }
-                }
-                .fullScreenCover(item: $logoutWebURL) { link in
-                    WebView(
-                        url: link.url,
-                        dismissOnFail: true,
-                        closesOnIntroStart: false,
-                        dismissOnFinish: true,
-                        onFinished: {
-                            logoutWebURL = nil
-                        },
-                        didFail: { error in
-                            print("Logout WebView fail:", error)
-                            logoutWebURL = nil
-                        }
-                    )
                 }
                 .onAppear{
                     self.cpfCnpj = username
@@ -432,19 +416,13 @@ extension LoginView {
         UserDefaults.standard.set(digits, forKey: "cpf")
     }
 
-    private func performLogout(redirectURL: URL?) {
-        let destination = redirectURL ?? Links.intro.url
-        print("Logout URL:", destination.absoluteString)
-
+    /// Só volta ao login depois que o WebView de logout concluiu (sucesso ou falha).
+    private func finishLogout() {
+        print("Logout concluído — limpando sessão e voltando ao login")
         clearSessionCredentials()
         resetHomeViewModel()
         resetLoginForm()
         showHome = false
-
-        // Dispensa a Home e em seguida carrega o logout no servidor (intro.do).
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            self.logoutWebURL = IdentifiableURL(url: destination)
-        }
     }
 
     private func clearSessionCredentials() {
@@ -478,10 +456,7 @@ extension LoginView {
     }
 
     private func clearSessionAndCloseHome() {
-        clearSessionCredentials()
-        resetHomeViewModel()
-        resetLoginForm()
-        showHome = false
+        finishLogout()
     }
     
     //MARK: - Fechando o teclado

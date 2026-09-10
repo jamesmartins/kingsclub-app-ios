@@ -13,6 +13,7 @@ struct HomeView: View {
 
     private let menuItems = HomeMenuItem.allCases
     @State private var menuWebLink: IdentifiableURL?
+    @State private var logoutWebLink: IdentifiableURL?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -50,12 +51,32 @@ struct HomeView: View {
             viewModel.onOpenURL = { url, _ in
                 menuWebLink = IdentifiableURL(url: url)
             }
+            viewModel.onLogout = { url in
+                logoutWebLink = IdentifiableURL(url: url ?? Links.intro.url)
+            }
             viewModel.loadHome()
         }
         .fullScreenCover(item: $menuWebLink) { link in
             WebView(url: link.url, dismissOnFail: false) { errorDescription in
                 print(errorDescription)
             }
+        }
+        .fullScreenCover(item: $logoutWebLink) { link in
+            WebView(
+                url: link.url,
+                dismissOnFail: true,
+                closesOnIntroStart: false,
+                dismissOnFinish: true,
+                onFinished: {
+                    logoutWebLink = nil
+                    viewModel.onLogoutCompleted?()
+                },
+                didFail: { error in
+                    print("Logout WebView fail:", error)
+                    logoutWebLink = nil
+                    viewModel.onLogoutCompleted?()
+                }
+            )
         }
     }
 
@@ -118,14 +139,9 @@ struct HomeView: View {
     private func summaryCard(title: String, value: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 4) {
-                    Text(title)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(.white.opacity(0.9))
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.9))
-                }
+                Text(title)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(.white.opacity(0.9))
                 Text(value)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
